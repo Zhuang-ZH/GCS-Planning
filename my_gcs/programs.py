@@ -79,11 +79,12 @@ class ConicProgram:
             self.columns[v.id] = range(start, stop)
 
         # cost function
-        # 将 conic_prob.c 转换为一个一维的 NumPy 数组，并将其分割为 c 和 d
+        # conic_prob.c 是一个表示锥规划问题中目标函数的向量, 将 conic_prob.c 转换为一个一维的 NumPy 数组，并将其分割为 c 和 d
         cd = conic_prob.c.toarray().flatten()
         # TODO: convert to sparse format
         self.c = cd[:-1]
         self.d = cd[-1]
+        # self.num_variables 表示的是锥规划问题中变量的数量
         self.num_variables = len(self.c)
 
         # constraints
@@ -129,14 +130,19 @@ class ConicProgram:
 
     @staticmethod
     def constrain_in_cone(x, K):
+        # 零约束
         if K == cp.constraints.Zero:
              return cp.constraints.Zero(x)
+        # 非负约束
         elif K == cp.constraints.NonNeg:
              return cp.constraints.NonNeg(x)
+        # 非正约束
         elif K == cp.constraints.NonPos:
              return cp.constraints.NonPos(x)
+        # 对称约束
         elif K == cp.constraints.SOC:
             return cp.constraints.SOC(x[0], x[1:])
+        # 正半定约束
         elif K == cp.constraints.PSD:
             n = round(np.sqrt(x.size))
             x_mat = cp.reshape(x, (n, n))

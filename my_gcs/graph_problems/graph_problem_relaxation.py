@@ -12,6 +12,7 @@ def graph_problem_relaxation(gcs, problem, callback=None):
     ye = gcs.edge_relaxed_binaries()
 
     # continuous variables
+    # conic.num_variables 为 锥规划问题中变量的数量
     xv = np.array([cp.Variable(v.conic.num_variables) for v in gcs.vertices])
     zv = np.array([cp.Variable(v.conic.num_variables) for v in gcs.vertices])
     ze = np.array([cp.Variable(e.conic.num_variables) for e in gcs.edges])
@@ -24,7 +25,9 @@ def graph_problem_relaxation(gcs, problem, callback=None):
     for i, v in enumerate(gcs.vertices):
         
         # cost on the vertices including domain constraint
+        # v.conic.c @ zv[i] + v.conic.d * yv[i]
         cost += v.conic.eval_cost(zv[i], yv[i])
+        # Ai @ zv[i] + bi * yv[i], 再转换成锥约束
         constraints += v.conic.eval_constraints(zv[i], yv[i])
         
     for k, e in enumerate(gcs.edges):
@@ -53,7 +56,9 @@ def graph_problem_relaxation(gcs, problem, callback=None):
     # solve problem
     prob = cp.Problem(cp.Minimize(cost), constraints)
     prob.solve(verbose=False)
+    # prob.solve(solver=cp.SCS, verbose=True, max_iters=1000)
     if callback is not None:
+        print('callback is not None')
         while True:
             new_constraints = callback(yv, ye)
             if len(new_constraints) == 0:

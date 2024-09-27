@@ -77,19 +77,19 @@ def randomForwardPathSearch(regions, edges, edge_weights, source, target, max_pa
 
     return runTrials(source, target, getCandidateEdgesFn, edgeSelectorFn, max_paths, max_trials)
 
-def findMaxWeightPath(paths):
-    max_weight = -float('inf')
-    max_weight_path = None
+def findMinCostPath(paths, cost):
+    min_cost = float('inf')
+    min_cost_path = None
     for path in paths:
-        total_weight = sum(edge[2]['weight'] for edge in path)
-        if total_weight > max_weight:
-            max_weight = total_weight
-            max_weight_path = path
+        total_cost = sum(cost.get((edge[0], edge[1]), float('inf')) for edge in path)
+        if total_cost < min_cost:
+            min_cost = total_cost
+            min_cost_path = path
 
     # 将边列表转换为顶点列表
-    if max_weight_path:
-        vertex_path = [max_weight_path[0][0]]  # 添加起点
-        for edge in max_weight_path:
+    if min_cost_path:
+        vertex_path = [min_cost_path[0][0]]  # 添加起点
+        for edge in min_cost_path:
             vertex_path.append(edge[1])  # 添加终点
         return vertex_path
     return None

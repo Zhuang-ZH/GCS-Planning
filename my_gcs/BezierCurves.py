@@ -36,16 +36,14 @@ class BezierCurves:
 
     @ staticmethod
     def calculate_curvature(points):
-        # 计算每个点的导数
+
         dx_dt = np.gradient(points[:, 0])
         dy_dt = np.gradient(points[:, 1])
-        
-        # 计算每个点的二阶导数
+
         d2x_dt2 = np.gradient(dx_dt)
         d2y_dt2 = np.gradient(dy_dt)
-        
-        # 计算曲率
-        curvature = (d2x_dt2 * dy_dt - dx_dt * d2y_dt2) / (dx_dt**2 + dy_dt**2)**1.5
+
+        curvature = (dx_dt * d2y_dt2 - d2x_dt2 * dy_dt) / (dx_dt**2 + dy_dt**2)**1.5
         
         return curvature
     
@@ -181,7 +179,8 @@ class BezierCurves:
 
         # 根据数据范围调整横坐标和纵坐标的最小单位
         ax.xaxis.set_major_locator(MultipleLocator(max(1, len(all_curvatures) // 7)))
-        ax.yaxis.set_major_locator(MultipleLocator(max(0.1, (max(all_curvatures) - min(all_curvatures)) / 10)))
+        # ax.yaxis.set_major_locator(MultipleLocator(max(0.1, (max(all_curvatures) - min(all_curvatures)) / 10)))
+        ax.yaxis.set_major_locator(MultipleLocator(max(0.1, 0.25)))
 
 
         # 在右上角显示 order 和 continuity
@@ -302,8 +301,28 @@ class BezierCurves:
                     second_derivative_next = self.bezier_curve_kth_derivative(0, points[next_name], 2)
                     constraints.append(second_derivative_current == second_derivative_next)
 
+        ## 以下为曲率约束
+        # 控制加速度
+        for name in path:
+            x = points[name]
+            t_values = np.linspace(0, 1, self.discrete_points_num)
+            for t in t_values:
+                # 添加曲率约束
+                second_derivative = self.bezier_curve_kth_derivative(t, x, 2)
+                constraints.append(cp.norm(second_derivative, 2) <= 1.5)
+        
+        # 限制三阶导数
+        # for name in path:
+        #     x = points[name]
+        #     t_values = np.linspace(0, 1, self.discrete_points_num)
+        #     for t in t_values:
+        #         # 添加曲率约束
+        #         third_derivative = self.bezier_curve_kth_derivative(t, x, 3)
+        #         constraints.append(cp.norm(third_derivative, 2) <= 2)
+
         # 目标函数：曲线总长度       
         # sum_length = 0
+        # lambda_curvature = 0.1
         # curve_points_all = {}
         # for name in path:
         #     x = points[name]
@@ -323,7 +342,29 @@ class BezierCurves:
             for i in range(1, self.order + 1):
                 sum_length += cp.abs(cp.norm(x[i] - x[i - 1]))
 
-        goal = sum_length
+        # 曲率惩罚项
+        curvature_penalty = 0
+        lambda_curvature = 0.1
+        for name in path:
+            x = points[name]
+            t_values = np.linspace(0, 1, self.discrete_points_num)
+            for t in t_values:
+                # 添加曲率约束
+                second_derivative = self.bezier_curve_kth_derivative(t, x, 2)
+                curvature_penalty += cp.sum_squares(second_derivative)
+
+        # 控制点距离惩罚项
+        # control_points_penalty = 0
+        # lambda_control_points = 0.1
+        # min_distance = 0.1
+        # for name in path:
+        #     x = points[name]
+        #     for i in range(1, self.order + 1):
+        #         dist = cp.norm(x[i] - x[i - 1])
+        #         control_points_penalty += cp.square(cp.maximum(0, min_distance - dist))
+
+        goal = sum_length + lambda_curvature * curvature_penalty
+        # goal = sum_length + lambda_curvature * curvature_penalty + lambda_control_points * control_points_penalty
 
         objective = cp.Minimize(goal)
 

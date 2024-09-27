@@ -37,7 +37,7 @@ def plot_vertex_2d(vertex, n=50, tol=1e-4, **kwargs):
 
     # print(f"Before plotting: {vertex.y_relaxed.value}")
 
-    options = {'fc': 'mintcream', 'ec': 'black'}
+    options = {'facecolor': 'mintcream', 'ec': 'black', 'alpha': 0.5}
     options.update(kwargs)
     vertex_min = np.min(vertices, axis=0)
     vertex_max = np.max(vertices, axis=0)
@@ -87,13 +87,14 @@ def closest_points(vertex1, vertex2):
     return points
 
 
-def plot_gcs_2d(gcs, n=50):
+def plot_gcs_2d(gcs, n=50, is_plot_edges=True):
     for vertex in gcs.vertices:
         if vertex.variables[0].size != 2:
             raise ValueError("Can only plot 2D sets.")
         plot_vertex_2d(vertex, n)
-    for edge in gcs.edges:
-        plot_edge_2d(edge, color='grey')
+    if is_plot_edges:
+        for edge in gcs.edges:
+            plot_edge_2d(edge, color='grey')
 
 
 
@@ -134,7 +135,9 @@ def plot_relaxed_subgraph_2d(gcs, tol=1e-4):
             # 在中点位置添加文本标签
             plt.text(mid_point[0], mid_point[1], f'{edge.y_relaxed.value:.2f}', color='red', fontsize=8, ha='center')
 
-
+def plot_corridors(gcs, corridors, **kwargs):
+    for vertex in corridors:
+            plot_vertex_2d(vertex, facecolor='darkblue', alpha=0.5, **kwargs)
 
 def graphviz_gcs(gcs, vertex_labels=None, edge_labels=None):
     if vertex_labels is None:

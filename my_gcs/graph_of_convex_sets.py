@@ -201,6 +201,10 @@ class GraphOfConvexSets:
         from plot_utils import plot_relaxed_subgraph_2d
         return plot_relaxed_subgraph_2d(self) 
     
+    def plot_corridors(self, corridors):
+        from plot_utils import plot_corridors
+        return plot_corridors(self, corridors)
+    
     ###
     def add_region_to_GCS(self, regions):
         vertices = {}
@@ -222,7 +226,8 @@ class GraphOfConvexSets:
             v_end, x_end = vertices[end]
             edge = self.add_edge(v_start, v_end)
             edge.add_cost(cp.norm(x_start - x_end, 2))
-            edge.add_constraint(x_end[1] >= x_start[1])
+            # bug所在
+            # edge.add_constraint(x_end[1] >= x_start[1])
 
     
     def find_start_end_region(self, start_point, end_point, regions):
@@ -238,3 +243,6 @@ class GraphOfConvexSets:
             return {(edge.tail.name, edge.head.name): edge.y_relaxed.value for edge in self.edges}
         else:
             return {(edge.tail.name, edge.head.name): edge.y.value for edge in self.edges}
+        
+    def get_edge_costs(self):
+        return {(edge.tail.name, edge.head.name): edge.cost.value for edge in self.edges}

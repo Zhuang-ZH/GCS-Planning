@@ -1,10 +1,18 @@
 import cvxpy as cp
 import numpy as np
 import sys
+import os
+
 import pandas as pd
 
 
-sys.path.append('../PathPlanning/GCS_Planning/my_gcs')
+# 获取当前路径的父路径
+parent_path = os.path.dirname(os.path.abspath(__file__))
+parent_path = os.path.dirname(parent_path)
+# 将父路径添加到 sys.path
+sys.path.append(parent_path)
+print(sys.path)
+
 from graph_of_convex_sets import GraphOfConvexSets, Vertex
 import matplotlib.pyplot as plt
 from RandomDFS_relaxed import randomForwardPathSearch, findMaxWeightPath
@@ -19,8 +27,8 @@ x_min, x_max = -2, 2
 y_min, y_max = -2, 2
 
 # 定义起点和终点
-start_point = np.array([-1.8, 0])
-end_point = np.array([0.7, 1.2])
+start_point = np.array([-1.8, 0.3])
+end_point = np.array([1.8, 0])
 
 order = 3
 continuity = 1
@@ -91,7 +99,7 @@ print(f"control_points: {control_points}")
 all_points = np.concatenate(list(curve_points.values()))
 # print(f"all_points: {all_points}")
 # 按空间离散
-# all_points = np.concatenate(list(uniform_points.values()))
+all_points = np.concatenate(list(uniform_points.values()))
 # print(f"all_points: {all_points}")
 
 # all_curvatures = BezierCurves.calculate_curvature(all_points)
@@ -113,7 +121,7 @@ data = {
 df = pd.DataFrame(data)
 
 # 输出到 CSV 文件
-df.to_csv('GCS_Planning/my_gcs/test/output.csv', index=False)
+df.to_csv('output.csv', index=False)
 
 # # 曲率折线图
 # fig1, ax1 = plt.subplots(figsize=(10, 5))
@@ -146,9 +154,9 @@ df.to_csv('GCS_Planning/my_gcs/test/output.csv', index=False)
 fig1, ax1 = plt.subplots(figsize=(5, 5))
 Bezier_Curves.plot_regions(ax1)
 # 按时间离散
-Bezier_Curves.plot_bezier_curve(ax1, curve_points, control_points)
+# Bezier_Curves.plot_bezier_curve(ax1, curve_points, control_points)
 # 按空间离散
-# Bezier_Curves.plot_bezier_curve(ax2, uniform_points, control_points)
+Bezier_Curves.plot_bezier_curve(ax1, uniform_points, control_points)
 
 # 创建一个 2x2 的子图布局
 fig, axs = plt.subplots(4, 1, figsize=(8, 12))
