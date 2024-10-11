@@ -26,7 +26,7 @@ def is_union(rect1, rect2, tolerance=1e-6):
     x2_max, y2_max = rect2["center"][0] + rect2["size"][0] / 2, rect2["center"][1] + rect2["size"][1] / 2
 
     # 检查是否只在一个点相交
-    if (x1_max == x2_min or x1_min == x2_max) and (y1_max == y2_min or y1_min == y2_max):
+    if (abs(x1_max - x2_min) < tolerance or abs(x1_min - x2_max) < tolerance) and (abs(y1_max - y2_min) < tolerance or abs(y1_min - y2_max) < tolerance):
         return False
 
     return not (x1_max + tolerance < x2_min or x1_min - tolerance > x2_max or y1_max + tolerance < y2_min or y1_min - tolerance > y2_max)
@@ -105,10 +105,8 @@ def generate_regions(x_min, x_max, y_min, y_max, obstacles):
 
     return final_regions
 
-def generate_isolated_regions(x_min, x_max, y_min, y_max, obstacles):
+def generate_isolated_regions(x_min, x_max, y_min, y_max, obstacles, region_width=0.5, region_height=0.5):
     regions = []
-    region_width = 0.5  # 假设每个区域的宽度为0.5
-    region_height = 0.5  # 假设每个区域的高度为0.5
     region_id = 1
 
     x = x_min

@@ -41,17 +41,17 @@ def randomEdgeSelector(candidate_edges, flows):
     return candidate_edges[selected_edge]
 
 # Rounding Strategies
-def runTrials(source, target, getCandidateEdgesFn, edgeSelectorFn, max_paths=10, max_trials=1000):
+def runTrials(source, target, getCandidateEdgesFn, edgeSelectorFn, max_trials=1000):
     paths = []
     trials = 0
-    while len(paths) < max_paths and trials < max_trials:
+    while trials < max_trials:
         trials += 1
         path = depthFirst(source, target, getCandidateEdgesFn, edgeSelectorFn)
         if path not in paths:
             paths.append(path)
     return paths
 
-def randomForwardPathSearch(regions, edges, edge_weights, source, target, max_paths=10, max_trials=100, seed=None, flow_tol=1e-5, **kwargs):
+def randomForwardPathSearch(regions, edges, edge_weights, source, target, max_trials=100, seed=None, flow_tol=1e-5, **kwargs):
     """随机前向路径搜索"""
 
     if seed is not None:
@@ -75,7 +75,7 @@ def randomForwardPathSearch(regions, edges, edge_weights, source, target, max_pa
         e = randomEdgeSelector(candidate_edges, flows)
         return e, e[1]
 
-    return runTrials(source, target, getCandidateEdgesFn, edgeSelectorFn, max_paths, max_trials)
+    return runTrials(source, target, getCandidateEdgesFn, edgeSelectorFn, max_trials)
 
 def findMinCostPath(paths, cost):
     min_cost = float('inf')
