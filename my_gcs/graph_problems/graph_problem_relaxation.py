@@ -56,6 +56,7 @@ def graph_problem_relaxation(gcs, problem, callback=None):
     # solve problem
     prob = cp.Problem(cp.Minimize(cost), constraints)
     prob.solve(verbose=False)
+    # prob.solve(verbose=False, solver=cp.SCS, eps=1e-3, max_iters=10000)
     # prob.solve(solver=cp.SCS, verbose=True, max_iters=1000)
     if callback is not None:
         print('callback is not None')

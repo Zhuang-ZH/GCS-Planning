@@ -193,6 +193,10 @@ class GraphOfConvexSets:
         from plot_utils import plot_gcs_2d
         return plot_gcs_2d(self, **kwargs)
 
+    def plot_velocity_2d(self, inner_radius, outer_radius):
+        from plot_utils import plot_gcs_velocity_2d
+        return plot_gcs_velocity_2d(inner_radius=inner_radius, outer_radius=outer_radius)
+
     def plot_subgraph_2d(self):
         from plot_utils import plot_subgraph_2d
         return plot_subgraph_2d(self) 
@@ -201,9 +205,17 @@ class GraphOfConvexSets:
         from plot_utils import plot_relaxed_subgraph_2d
         return plot_relaxed_subgraph_2d(self) 
     
+    def plot_subgraph_velocity_2d(self, Q0, Q1, Q2):
+        from plot_utils import plot_subgraph_velocity_2d
+        return plot_subgraph_velocity_2d(Q0 = Q0, Q1 = Q1, Q2 = Q2)
+    
     def plot_corridors(self, corridors):
         from plot_utils import plot_corridors
         return plot_corridors(self, corridors)
+    
+    def plot_path(self, contorl_points):
+        from plot_utils import plot_path
+        return plot_path(self, contorl_points)
     
     ###
     def add_region_to_GCS(self, regions):

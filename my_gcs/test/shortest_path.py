@@ -1,8 +1,13 @@
 import cvxpy as cp
 import numpy as np
 import sys
+import os
 
-sys.path.append('../PathPlanning/GCS_Planning/my_gcs')
+# 获取当前路径的父路径
+parent_path = os.path.dirname(os.path.abspath(__file__))
+parent_path = os.path.dirname(parent_path)
+# 将父路径添加到 sys.path
+sys.path.append(parent_path)
 from graph_of_convex_sets import GraphOfConvexSets
 import matplotlib.pyplot as plt
 
